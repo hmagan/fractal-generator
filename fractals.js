@@ -47,6 +47,7 @@ function drawLine(x1, y1, x2, y2){
 }
 
 function eraseLine(x1, y1, x2, y2){
+    setStrokeColor("#FFFFFF");
     context.beginPath();
     context.moveTo(x1, y1);
     context.lineTo(x2, y2);
@@ -111,76 +112,120 @@ function enableTreeOnClick(){
 
     canvas.addEventListener("click", function(){
         iterations++;
+        setFillColor("#FFFFFF");
+        context.fillRect(0, 0, 900, 900);
         drawTree(450, 900, 450, 800, iterations);
     });
 }
 
 //incomplete
-function kochSnowflake(lines, iteration){
-    if(iteration <= 1){
-        setStrokeColor("#000000");
-        drawEmptyTriangle(180, 620, 450, 170, 730, 620);
-    } else {
-        
-        let newLines = [];
-        for(line in lines){
-            newLines.push(line);
-        }
-        for(let i = 0; i < lines.length; i++){
-            let a = {
-                x: 0,
-                y: 0
-            };
-            let b = {
-                x: 0,
-                y: 0
-            };
-            let c = {
-                x: 0,
-                y: 0
-            };
-            if(lines[i][1] === lines[i][3]){
-                a.x = lines[i][0] + (1/3) * (lines[i][2] - lines[i][0]);
-                a.y =  lines[i][1];
-                b.x = lines[i][0] + (2/3) * (lines[i][2] - lines[i][0]);
-                b.y = lines[i][3];
-                c.x = (a.x + b.x) / 2;
-                c.y = a.y + (1/3) * (lines[i][2] - lines[i][0]);
+// function kochSnowflake(lines, curr, iteration){
+//     if(curr === 0){
+//         setStrokeColor("#000000");
+//         drawEmptyTriangle(180, 620, 450, 170, 730, 620);
+//         console.log(lines);
+//         console.log(curr);
+//         kochSnowflake(lines, curr + 1, iteration);
+//     } else if(curr !== iteration){
+//         let newLines = [];
+//         for(let i = 0; i < lines.length; i++){
+//             let a = {
+//                 x: 0,
+//                 y: 0
+//             };
+//             let b = {
+//                 x: 0,
+//                 y: 0
+//             };
+//             let c = {
+//                 x: 0,
+//                 y: 0
+//             };
+//             switch(lines[i][4]){
+//                 case 1:
+//                     a.x = lines[i][0] + (1/3) * (lines[i][2] - lines[i][0]);
+//                     a.y =  lines[i][1];
+//                     b.x = lines[i][0] + (2/3) * (lines[i][2] - lines[i][0]);
+//                     b.y = lines[i][3];
+//                     c.x = (a.x + b.x) / 2;
+//                     c.y = a.y + (1/3) * (lines[i][2] - lines[i][0]);
+//                     newLines.push([a.x, a.y, c.x, c.y]);
+//                     newLines.push([b.x, b.y, c.x, c.y]);
+//                     break;
+//                 case 2:
+//                     // a.x = lines[i][0] + (1/3) * (lines[i][2] - lines[i][0]);
+//                     // a.y =  lines[i][1];
+//                     // b.x = lines[i][0] + (2/3) * (lines[i][2] - lines[i][0]);
+//                     // b.y = lines[i][3];
+//                     // c.x = (a.x + b.x) / 2;
+//                     // c.y = a.y + (1/3) * (lines[i][2] - lines[i][0]);
+//                     break;
+//                 case 3:
+//                     // a.x = lines[i][0] + (1/3) * (lines[i][2] - lines[i][0]);
+//                     // a.y =  lines[i][1];
+//                     // b.x = lines[i][0] + (2/3) * (lines[i][2] - lines[i][0]);
+//                     // b.y = lines[i][3];
+//                     // c.x = (a.x + b.x) / 2;
+//                     // c.y = a.y + (1/3) * (lines[i][2] - lines[i][0]);
+//                     break;
+//                 default: 
+//                     console.log("ERROR: Missing line type.");
+//             }
+    
+//             setStrokeColor("#000000");
+//             drawEmptyTriangle(a.x, a.y, b.x, b.y, c.x, c.y);
+//             //erase base line
+//             eraseLine(a.x, a.y, b.x, b.y);
+//         }
+//         console.log(newLines);
+//         console.log(curr);
+//         kochSnowflake(newLines, curr + 1, iteration);
+//     }
+// }
+// kochSnowflake([[180, 620, 450, 170, 3], [450, 170, 730, 620, 2], [180, 620, 730, 620, 1]], 0, 2);
+
+function drawVicsekCrossFractal(squares, curr, max){
+    if(curr < max){
+        setFillColor("#FFFFFF");
+        context.fillRect(0, 0, 900, 900);
+
+        let newSquares = [];
+        setFillColor("#000000");
+        for(let i = 0; i < squares.length; i++){
+            context.fillRect(squares[i][0], squares[i][1], squares[i][2], squares[i][3]);
+            let left = squares[i][0] + squares[i][2] < 450;
+            let up = squares[i][1] + squares[i][3] < 450;
+            //figure out better way to do this
+            if(left && up){
+                console.log("lu");
+                newSquares.push([squares[i][0] - squares[i][2] / 3, squares[i][1] - squares[i][3] / 3, squares[i][2] / 3, squares[i][3] / 3]);
+            } else if (left){
+                console.log("l");
+                newSquares.push([squares[i][0] - squares[i][2] / 9, squares[i][1] + squares[i][3] / 3, squares[i][2] / 3, squares[i][3] / 3]);
+            } else if (up){
+                console.log("u");
+                newSquares.push([squares[i][0] + squares[i][2] / 3, squares[i][1] - squares[i][3] / 3, squares[i][2] / 3, squares[i][3] / 3]);
             } else {
-                //a_x + (b_x - a_x) / 2, (b_y + a_y) / 2
-                a.x = lines[i][0] + (1/3) * (lines[i][2] - lines[i][0]);
-                a.y =  lines[i][1];
-                b.x = lines[i][0] + (2/3) * (lines[i][2] - lines[i][0]);
-                b.y = lines[i][3];
-                c.x = (a.x + b.x) / 2;
-                c.y = a.y + (1/3) * (lines[i][2] - lines[i][0]);
+                console.log("n/a");
+                newSquares.push([squares[i][0] + squares[i][2] / 3, squares[i][1] + squares[i][3] / 3, squares[i][2] / 3, squares[i][3] / 3]);
             }
-            drawEmptyTriangle(a.x, a.y, b.x, b.y, c.x, c.y);
-            //erase base line
-            context.strokeStyle = "#FFFFFF";
-            eraseLine(a.x, a.y, b.x, b.y);
-            newLines.push([a.x, a.y, c.x, c.y]);
-            newLines.push([b.x, b.y, c.x, c.y]);
         }
-        kochSnowflake(newLines, iteration - 1);
+        console.log(squares);
+        console.log(newSquares);
+        let len = squares.length;
+        for(let i = 0; i < len; i++){
+            //up
+            //newSquares.push([newSquares[i][0], newSquares[i][1] - squares[0][3], newSquares[i][2], newSquares[i][3]]);
+            //down
+            //newSquares.push([newSquares[i][0], newSquares[i][1] + squares[0][3], newSquares[i][2], newSquares[i][3]]);
+            //left
+           // newSquares.push([newSquares[i][0] - squares[0][2], newSquares[i][1], newSquares[i][2], newSquares[i][3]]);
+            //right
+            //newSquares.push([newSquares[i][0] + squares[0][2], newSquares[i][1], newSquares[i][2], newSquares[i][3]]);
+            
+        }
+        drawVicsekCrossFractal(newSquares, curr + 1, max);
     }
-    console.log(iteration);
 }
 
-kochSnowflake([[180, 620, 450, 170], [450, 170, 730, 620], [180, 620, 730, 620]], 2);
-
-let a_x = 180;
-let a_y = 620;
-let b_x = 450;
-let b_y = 170;
-let c_x = 730;
-let c_y = 620;
-context.beginPath();
-context.translate(0, 950);
-context.scale(1, -1);
-context.moveTo(a_x, a_y);
-context.lineTo(b_x, b_y);
-context.lineTo(c_x, c_y);
-context.closePath();
-context.rotate(2 * Math.PI);
-context.stroke();
+drawVicsekCrossFractal([[300, 0, 300, 300], [0, 300, 300, 300], [600, 300, 300, 300], [300, 600, 300, 300], [300, 300, 300, 300]], 0, 2);
