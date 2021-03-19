@@ -184,48 +184,51 @@ function enableTreeOnClick(){
 // }
 // kochSnowflake([[180, 620, 450, 170, 3], [450, 170, 730, 620, 2], [180, 620, 730, 620, 1]], 0, 2);
 
-function drawVicsekCrossFractal(squares, curr, max){
-    if(curr < max){
+function drawVicsekCrossFractal(iterations){
+    if(iterations <= 1){
+        context.fillRect(300, 0, 300, 300);
+        context.fillRect(0, 300, 300, 300);
+        context.fillRect(600, 300, 300, 300);
+        context.fillRect(300, 600, 300, 300);
+        context.fillRect(300, 300, 300, 300);
+    } else {
+        drawVicsekCrossFractal(iterations - 1);
+
+        let data = context.getImageData(0, 0, 1800, 1800);
+
+        if(iterations != 2){
+            context.scale(3 / 0.5, 3 / 0.5);
+        }
+
+        //reset canvas
         setFillColor("#FFFFFF");
         context.fillRect(0, 0, 900, 900);
 
-        let newSquares = [];
-        setFillColor("#000000");
-        for(let i = 0; i < squares.length; i++){
-            context.fillRect(squares[i][0], squares[i][1], squares[i][2], squares[i][3]);
-            let left = squares[i][0] + squares[i][2] < 450;
-            let up = squares[i][1] + squares[i][3] < 450;
-            //figure out better way to do this
-            if(left && up){
-                console.log("lu");
-                newSquares.push([squares[i][0] - squares[i][2] / 3, squares[i][1] - squares[i][3] / 3, squares[i][2] / 3, squares[i][3] / 3]);
-            } else if (left){
-                console.log("l");
-                newSquares.push([squares[i][0] - squares[i][2] / 9, squares[i][1] + squares[i][3] / 3, squares[i][2] / 3, squares[i][3] / 3]);
-            } else if (up){
-                console.log("u");
-                newSquares.push([squares[i][0] + squares[i][2] / 3, squares[i][1] - squares[i][3] / 3, squares[i][2] / 3, squares[i][3] / 3]);
-            } else {
-                console.log("n/a");
-                newSquares.push([squares[i][0] + squares[i][2] / 3, squares[i][1] + squares[i][3] / 3, squares[i][2] / 3, squares[i][3] / 3]);
-            }
-        }
-        console.log(squares);
-        console.log(newSquares);
-        let len = squares.length;
-        for(let i = 0; i < len; i++){
-            //up
-            //newSquares.push([newSquares[i][0], newSquares[i][1] - squares[0][3], newSquares[i][2], newSquares[i][3]]);
-            //down
-            //newSquares.push([newSquares[i][0], newSquares[i][1] + squares[0][3], newSquares[i][2], newSquares[i][3]]);
-            //left
-           // newSquares.push([newSquares[i][0] - squares[0][2], newSquares[i][1], newSquares[i][2], newSquares[i][3]]);
-            //right
-            //newSquares.push([newSquares[i][0] + squares[0][2], newSquares[i][1], newSquares[i][2], newSquares[i][3]]);
-            
-        }
-        drawVicsekCrossFractal(newSquares, curr + 1, max);
+        let newCanvas = document.createElement("canvas");
+        newCanvas.width = data.width;
+        newCanvas.height = data.height;
+
+        newCanvas.getContext("2d").putImageData(data, 0, 0);
+
+        context.scale(0.5 / 3, 0.5 / 3);
+
+        context.drawImage(newCanvas, 1800, 0);
+        context.drawImage(newCanvas, 0, 1800);
+        context.drawImage(newCanvas, 1800, 1800);
+        context.drawImage(newCanvas, 3600, 1800);
+        context.drawImage(newCanvas, 1800, 3600);
     }
 }
 
-drawVicsekCrossFractal([[300, 0, 300, 300], [0, 300, 300, 300], [600, 300, 300, 300], [300, 600, 300, 300], [300, 300, 300, 300]], 0, 2);
+//not working for some reason
+function enableVicsekCrossFractalOnClick(){
+    let iterations = 1;
+    drawVicsekCrossFractal(iterations);
+
+    canvas.addEventListener("click", function(){
+        iterations++;
+        drawVicsekCrossFractal(iterations);
+    });
+}
+
+enableVicsekCrossFractalOnClick();
